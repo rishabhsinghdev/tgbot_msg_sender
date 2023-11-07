@@ -11,7 +11,11 @@ module.exports = (req, res) => {
 if (req.url === '/') {
     // Serve the index.html file
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
-} else if (req.url === '/send' && req.method === 'POST') {
+} else {
+    // Handle other routes or display a 404 message
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end('Not Found');
+}  else if (req.url === '/send' && req.method === 'POST') {
         let body = '';
         req.on('data', (data) => {
             body += data;
