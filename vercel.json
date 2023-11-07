@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "app.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/send", "dest": "app.js" },
+    { "src": "/(.*)", "dest": "app.js" }
+  ],
+  "env": {
+    "TELEGRAM_BOT_TOKEN": "6128740891:AAH9PRjVDjb_DxsGhzOI_ORiZSAXbjpp9R0",
+    "CHAT_ID": "2119695649"
+  }
+}
