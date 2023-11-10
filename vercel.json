@@ -9,6 +9,6 @@
   ],
   "env": {
     "TELEGRAM_BOT_TOKEN": "6128740891:AAH9PRjVDjb_DxsGhzOI_ORiZSAXbjpp9R0",
-    "CHAT_ID": "2119695649"
+    "CHAT_ID": "@cashback42payout_bot"
   }
 }
