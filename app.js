@@ -41,10 +41,10 @@ const server = http.createServer(async (req, res) => {
             // Rest of the code remains the same...
         } 
 } catch (error) {
-    console.error(error);
-    res.writeHead(500, { 'Content-Type': 'text/plain' });
-    res.end(`Error processing the request: ${error.message}`);
-}
+            console.error(error);
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Error processing the request');
+        }
     } else {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
         res.end('Not Found');
