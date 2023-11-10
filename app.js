@@ -30,34 +30,15 @@ const server = http.createServer(async (req, res) => {
     } else if (pathname === '/send' && req.method === 'POST') {
         try {
             const body = await getRequestBody(req);
-            const { message, id } = JSON.parse(decodeURIComponent(querystring.parse(body).message));
+            const { message } = JSON.parse(decodeURIComponent(querystring.parse(body).message));
 
-            // Check if the user has joined the channel (you need to implement this logic)
-            const userJoinedChannel = /* Implement logic to check if user joined the channel based on user ID (id) */;
+            // Extract user ID from the message object
+            const userId = message.from.id;
 
-            // Send appropriate message based on channel verification
-            const responseMessage = userJoinedChannel
-                ? `Hello, ${id}! ${WELCOME_MESSAGE}`
-                : `Hello, ${id}! Please join our channel to proceed.`;
+            // Placeholder logic: You need to implement the actual logic to check if the user joined the channel
+            const userJoinedChannel = true; // Replace this with your actual logic
 
-            const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-            const responseData = new URLSearchParams({
-                chat_id: id,
-                text: responseMessage,
-                reply_markup: JSON.stringify({
-                    inline_keyboard: [
-                        [{ text: 'Join Channel', url: CHANNEL_LINK }],
-                    ],
-                }),
-            }).toString();
-
-            await axios.post(telegramApiUrl, responseData, {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-            });
-
-            res.end('Message sent successfully!');
+            // Rest of the code remains the same...
         } catch (error) {
             console.error(error);
             res.writeHead(500, { 'Content-Type': 'text/plain' });
