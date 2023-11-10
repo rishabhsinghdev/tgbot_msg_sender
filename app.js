@@ -5,28 +5,14 @@ const axios = require('axios');
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const CHAT_ID = process.env.CHAT_ID;
-// ... (existing code)
-
 const WELCOME_MESSAGE = "Welcome to the Bot! Please join our channel.";
 const CHANNEL_LINK = "https://t.me/cashback42";
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
     const { pathname, query } = url.parse(req.url);
-    const params = querystring.parse(query);
 
     if (pathname === '/') {
         // Serve the HTML form
-        const welcomeMarkup = JSON.stringify({
-            inline_keyboard: [
-                [
-                    {
-                        text: 'Join Channel',
-                        url: CHANNEL_LINK,
-                    },
-                ],
-            ],
-        });
-
         res.writeHead(200, { 'Content-Type': 'text/html' });
         res.end(`<!DOCTYPE html>
 <html>
@@ -42,69 +28,61 @@ const server = http.createServer((req, res) => {
 </body>
 </html>`);
     } else if (pathname === '/send' && req.method === 'POST') {
-        let body = '';
-        req.on('data', (data) => {
-            body += data;
-        });
-        req.on('end', () => {
+        try {
+            const body = await getRequestBody(req);
             const { message, id } = JSON.parse(decodeURIComponent(querystring.parse(body).message));
-            
-            // Check if the user has joined the channel
+
+            // Check if the user has joined the channel (you need to implement this logic)
             const userJoinedChannel = /* Implement logic to check if user joined the channel based on user ID (id) */;
 
-            if (userJoinedChannel) {
-                // Send the welcome message
-                const welcomeMessage = `Hello, ${id}! ${WELCOME_MESSAGE}`;
-                const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-                const welcomeData = new URLSearchParams({
-                    chat_id: id,
-                    text: welcomeMessage,
-                    reply_markup: welcomeMarkup,
-                }).toString();
+            // Send appropriate message based on channel verification
+            const responseMessage = userJoinedChannel
+                ? `Hello, ${id}! ${WELCOME_MESSAGE}`
+                : `Hello, ${id}! Please join our channel to proceed.`;
 
-                axios.post(telegramApiUrl, welcomeData, {
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                }).then((response) => {
-                    console.log(response.data);
-                    res.end('Welcome message sent!');
-                }).catch((error) => {
-                    console.error(error);
-                    res.writeHead(500, { 'Content-Type': 'text/plain' });
-                    res.end('Error sending welcome message');
-                });
-            } else {
-                // Send a warning message
-                const warningMessage = `Hello, ${id}! Please join our channel to proceed.`;
-                const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-                const warningData = new URLSearchParams({
-                    chat_id: id,
-                    text: warningMessage,
-                }).toString();
+            const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            const responseData = new URLSearchParams({
+                chat_id: id,
+                text: responseMessage,
+                reply_markup: JSON.stringify({
+                    inline_keyboard: [
+                        [{ text: 'Join Channel', url: CHANNEL_LINK }],
+                    ],
+                }),
+            }).toString();
 
-                axios.post(telegramApiUrl, warningData, {
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                }).then((response) => {
-                    console.log(response.data);
-                    res.end('Warning message sent!');
-                }).catch((error) => {
-                    console.error(error);
-                    res.writeHead(500, { 'Content-Type': 'text/plain' });
-                    res.end('Error sending warning message');
-                });
-            }
-        });
+            await axios.post(telegramApiUrl, responseData, {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            });
+
+            res.end('Message sent successfully!');
+        } catch (error) {
+            console.error(error);
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Error processing the request');
+        }
     } else {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
         res.end('Not Found');
     }
 });
 
-// ... (existing code)
-
+const getRequestBody = (req) => {
+    return new Promise((resolve, reject) => {
+        let body = '';
+        req.on('data', (data) => {
+            body += data;
+        });
+        req.on('end', () => {
+            resolve(body);
+        });
+        req.on('error', (error) => {
+            reject(error);
+        });
+    });
+};
 
 server.listen(process.env.PORT || 3000, () => {
     console.log('Server is running');
